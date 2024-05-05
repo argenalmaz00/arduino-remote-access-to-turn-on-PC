@@ -2,23 +2,29 @@
 #include <ESP8266TelegramBOT.h>
 #include <WakeOnLan.h>
 
+// config
+// wifi config
 static String ssid = "#";
 static String password = "#";
-
+// telebot config
 static String token = "#";
 static String nameBot = "#";
 static String userBot = "#";
+// admin id user telegram
 static int idAdminUser = 0;
+// telebot init
 static TelegramBOT Tbot (token,nameBot,userBot);
+// wifi udp
 static WiFiUDP udp;
+// wake on lan 
 static WakeOnLan onLan (udp);
 // status wifi led
 static int pinLedStatusWiFi = 2; // D4
-// pin remover power
+// pin power (rele)
 static int pinPowerPC = 16; // D0
 static int pinStatusPc = 4; // D1
 static int pinResetPC = 5; // D2
-// mac desktop2
+// mac address desktop2
 static String macAddres = "22:35:4D:10:3F:B1";
 //init pin function
 void initPin(){
@@ -29,7 +35,7 @@ void initPin(){
   // init pin INPUT
   pinMode(pinStatusPc,INPUT);
 }
-
+// init wake On Lan
 void initWakeOnLan(){
   onLan.setRepeat(1,100);
   onLan.calculateBroadcastAddress(WiFi.localIP(),WiFi.subnetMask());
@@ -37,7 +43,6 @@ void initWakeOnLan(){
 void setup(){
     //init tty speed
     Serial.begin(9600);
-    // init pin
     initPin();
     WiFi.begin(ssid,password);
     Serial.print("WiFi : " + ssid + "Connect");
@@ -48,7 +53,8 @@ void setup(){
         Serial.print(".");
         delay(500);
     }
-    Serial.println("Done");
+    Serial.println();
+    Serial.println("Connectd");
     Serial.println(WiFi.localIP());
     initWakeOnLan();
     Tbot.begin();
@@ -58,8 +64,9 @@ void Bot_ExecMessages() {
   for (int i = 1; i < Tbot.message[0][0].toInt() + 1; i++){
       Serial.println("user : " + Tbot.message[i][2] + "\nmessage : " + Tbot.message[i][5]);
 
-    if (Tbot.message[i][1].toInt() == adminUser){
+    if (Tbot.message[i][1].toInt() == idAdminUser){
       Tbot.message[i][5].substring(1,Tbot.message[i][5].length());
+
       if (Tbot.message[i][5] == "/power"){
         digitalWrite(pinPowerPC,HIGH);
         delay(1000);
@@ -67,7 +74,6 @@ void Bot_ExecMessages() {
         String ms = "clicked power";
         Tbot.sendMessage(Tbot.message[i][4],ms,"");
       }
-
       else if (Tbot.message[i][5] == "/reset"){
         digitalWrite(pinResetPC,HIGH);
         delay(1500);
@@ -85,7 +91,6 @@ void Bot_ExecMessages() {
           Tbot.sendMessage(Tbot.message[i][4],ms,"");
         }
       }
-      
       else if (Tbot.message[i][5] == "/power_2"){
         onLan.sendMagicPacket(macAddres);
         String ms = "Desktop wake on lan run";
@@ -107,9 +112,9 @@ void Bot_ExecMessages() {
         Tbot.sendMessage(Tbot.message[i][4],ms,"");
       }
     }
-
+    // other user
     else {
-      String ms = "hello user " + Tbot.message[i][2] + " i'm not working";
+      String ms = "hello user " + Tbot.message[i][2] + " i'm not working,you id : " + Tbot.message[i][1];
       Tbot.sendMessage(Tbot.message[i][4],ms,"");
     }
     
@@ -123,6 +128,7 @@ long Bot_lasttime;
 
 void  loop(){
   if (millis() > Bot_lasttime + Bot_mtbs){
+    // Led status reconnect
     while (!WiFi.isConnected()){
       digitalWrite(pinLedStatusWiFi,HIGH);
       delay(500);

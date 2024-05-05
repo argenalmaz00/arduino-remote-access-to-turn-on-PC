@@ -8,7 +8,7 @@ static String password = "#";
 static String token = "#";
 static String nameBot = "#";
 static String userBot = "#";
-static int adminUser = 0;
+static int idAdminUser = 0;
 static TelegramBOT Tbot (token,nameBot,userBot);
 static WiFiUDP udp;
 static WakeOnLan onLan (udp);

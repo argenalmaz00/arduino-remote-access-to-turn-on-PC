@@ -6,8 +6,8 @@ static String ssid = "#";
 static String password = "#";
 
 static String token = "#";
-static String nameBot = "MyEsp8266_PC_BOT";
-static String userBot = "My_Esp8266_PC_Bot";
+static String nameBot = "#";
+static String userBot = "#";
 static int adminUser = 0;
 static TelegramBOT Tbot (token,nameBot,userBot);
 static WiFiUDP udp;
